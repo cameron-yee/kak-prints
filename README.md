@@ -10,7 +10,7 @@ To install with plug.kak, add the following to your kakrc, then run the :plug-in
 
 ### Usage
 
-#### .kakrc config
+#### kakrc config
 
 ```
 plug 'cameron-yee/kak-prints' config %{

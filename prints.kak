@@ -35,6 +35,8 @@ provide-module prints-mode %{
     }
 }
 
+require-module prints-mode
+
 map global prints c ':comment-prints<ret>' -docstring 'toggle commenting print statements'
 map global prints d ':delete-prints<ret>' -docstring 'delete print statements'
 

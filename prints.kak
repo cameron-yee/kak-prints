@@ -1,7 +1,8 @@
 declare-user-mode prints
 
 provide-module prints-mode %{
-    define-command comment-prints -docstring "toggle comments" %{
+    define-command -docstring "toggle comments" \
+    prints-mode-comment-prints %{
         declare-option str cl
         set-option buffer cl %val{cursor_line}
 
@@ -11,7 +12,8 @@ provide-module prints-mode %{
         execute-keys 'g<ret>'
     }
 
-    define-command delete-prints -docstring "delete print statements" %{
+    define-command -docstring "delete print statements" \
+    prints-mode-delete-prints %{
         declare-option int cl
         set-option buffer cl %val{cursor_line}
         
@@ -37,6 +39,6 @@ provide-module prints-mode %{
 
 require-module prints-mode
 
-map global prints c ':comment-prints<ret>' -docstring 'toggle commenting print statements'
-map global prints d ':delete-prints<ret>' -docstring 'delete print statements'
+map global prints c ': prints-mode-comment-prints<ret>' -docstring 'toggle commenting print statements'
+map global prints d ': prints-mode-delete-prints<ret>' -docstring 'delete print statements'
 

@@ -1,44 +1,42 @@
 declare-user-mode prints
 
+declare-option str current_line
+
 provide-module prints-mode %{
     define-command -docstring "toggle comments" \
     prints-mode-comment-prints %{
-        declare-option str cl
-        set-option buffer cl %val{cursor_line}
+        set-option buffer current_line %val{cursor_line}
 
-        execute-keys '%s<esc><a-s>s^[\s/]+(console.log|fmt.Print|println|System.out.println|echo)<ret>'
+        execute-keys '%s<esc><a-s>s^[\s/]+(console\.log|fmt\.Print|println|System\.out\.println|echo)<ret>'
         execute-keys ': comment-line<ret>'
-        execute-keys %opt{cl}
+        execute-keys %opt{current_line}
         execute-keys 'g<ret>'
     }
 
     define-command -docstring "delete print statements" \
     prints-mode-delete-prints %{
-        declare-option int cl
-        set-option buffer cl %val{cursor_line}
-        
-        # declare-option int sln
-        # set-option buffer sln %val{buf_line_count}
+        set-option buffer current_line %val{cursor_line}
 
-        execute-keys '%s<esc><a-s>s^[\s/]+(console.log|fmt.Print|println|System.out.println|echo)<ret><a-x>d<ret><space>'
-        
-        # declare-option int fln
-        # set-option buffer fln "-%val{buf_line_count}"
+		execute-keys '<esc>Ggs^[\s/]+(console\.log|fmt\.Print|println|System\.out\.println|echo)<ret>'
 
-    	# declare-option int lndiff
-    	# set-option buffer lndiff sln  
-    	# set-option -add buffer lndiff fln
-    	
-        # cl = cl - (sln - fln)
-        # set-option buffer cl execute-keys echo %sh{ echo $(expr $kak_opt_cl - ($kak_opt_sln - $kak_opt_fln))}
+        eval %sh{
+        	selections="$kak_reg_hash"
+        	deleted_lines_before_current_line=$(echo "$selections" | rev | cut -d' ' -f 1 | rev)
+    		[ $deleted_lines_before_current_line -gt 0 ] || { printf "reg a '%s'\n" "0"; exit; }
+    		printf "reg a '%s'\n" "$(expr $kak_opt_current_line - $deleted_lines_before_current_line)"
+        }
+
+        execute-keys '%s<esc><a-s>s^[\s/]+(console\.log|fmt\.Print|println|System\.out\.println|echo)<ret><a-x>d<ret><space>'
         
-        execute-keys %opt{cl}
+        set-option buffer current_line %reg{a}
+        
+        execute-keys %opt{current_line}
         execute-keys 'g<ret>'
     }
 }
 
 require-module prints-mode
 
-map global prints c ': prints-mode-comment-prints<ret>' -docstring 'toggle commenting print statements'
+map global prints c ': prints-mode-comment-prints<ret>' -docstring 'toggle comment all print statements'
 map global prints d ': prints-mode-delete-prints<ret>' -docstring 'delete print statements'
 

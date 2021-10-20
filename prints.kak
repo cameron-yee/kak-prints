@@ -17,11 +17,17 @@ provide-module prints-mode %{
     prints-mode-delete-prints %{
         set-option buffer current_line %val{cursor_line}
 
-		execute-keys '<esc>Ggs^[\s/]+(console\.log|fmt\.Print|println|System\.out\.println|echo)<ret>'
+		# execute-keys will throw an error if no matches are found for the search
+		try %{
+    		execute-keys '<esc>Ggs^[\s/]+(console\.log|fmt\.Print|println|System\.out\.println|echo)<ret>'
+		}
 
         eval %sh{
         	selections="$kak_reg_hash"
         	deleted_lines_before_current_line=$(echo "$selections" | rev | cut -d' ' -f 1 | rev)
+        	
+        	# this will jump the cursor up one line if there are no print statements before the cursor because
+        	# the minimum of $kak_reg_hash is 1
     		[ $deleted_lines_before_current_line -gt 0 ] || { printf "reg a '%s'\n" "0"; exit; }
     		printf "reg a '%s'\n" "$(expr $kak_opt_current_line - $deleted_lines_before_current_line)"
         }
